@@ -70,7 +70,8 @@ class Movie(models.Model):
     fees_in_world = models.PositiveIntegerField(
         'Сборы в мире', default=0, help_text='указывать сумму в долларах'
     )
-    category = models.ForeignKey(Category, verbose_name='Категория',
+    category = models.ForeignKey(Category, related_name='movies',
+                                 verbose_name='Категория',
                                  on_delete=models.SET_NULL, null=True)
 
     url = models.SlugField(max_length=130, unique=True)
@@ -89,7 +90,7 @@ class MovieShots(models.Model):
     title = models.CharField('Заголовок', max_length=100)
     description = models.TextField('Описание')
     image = models.ImageField('Изображение', upload_to='movie_shots/')
-    movie = models.ForeignKey(Movie, verbose_name='Фильм',
+    movie = models.ForeignKey(Movie, related_name='shots', verbose_name='Фильм',
                               on_delete=models.CASCADE)
     url = models.SlugField(max_length=100, unique=True)
 
@@ -116,8 +117,10 @@ class RatingStar(models.Model):
 class Rating(models.Model):
     """Рейтинг"""
     ip = models.CharField('IP адрес', max_length=15)
-    star = models.ForeignKey(RatingStar, models.CASCADE, 'Звезда')
-    movie = models.ForeignKey(Movie, models.CASCADE, 'Фильм')
+    star = models.ForeignKey(RatingStar, models.CASCADE, 'ratings',
+                             verbose_name='Звезда')
+    movie = models.ForeignKey(Movie, models.CASCADE, 'ratings',
+                              verbose_name='Фильм')
 
     def __str__(self):
         return f'{self.star} - {self.movie}'
