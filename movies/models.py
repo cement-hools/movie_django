@@ -97,7 +97,6 @@ class MovieShots(models.Model):
     movie = models.ForeignKey(Movie, related_name='shots',
                               verbose_name='Фильм',
                               on_delete=models.CASCADE)
-    url = models.SlugField(max_length=100, unique=True)
 
     def __str__(self):
         return self.title

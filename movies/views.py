@@ -1,5 +1,8 @@
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
+from django.views.generic.base import View
 
+from .forms import ReviewForm
 from .models import Movie
 
 
@@ -12,3 +15,16 @@ class MoviesDetailView(DetailView):
     """Полное описание фильма"""
     model = Movie
     slug_field = 'url'
+
+
+class AddReview(View):
+    """Отзывы"""
+
+    def post(self, request, pk):
+        form = ReviewForm(request.POST)
+        movie = get_object_or_404(Movie, id=pk)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.movie = movie
+            form.save()
+        return redirect(movie.get_absolut_url())
