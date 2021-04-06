@@ -143,7 +143,10 @@ class Review(models.Model):
     name = models.CharField('Имя', max_length=100)
     text = models.TextField('Обзор', max_length=5000)
     parent = models.ForeignKey(
-        'self', models.CASCADE, 'Родитель', blank=True, null=True
+        'self', models.CASCADE,
+        related_name='comment',
+        verbose_name='Родитель',
+        blank=True, null=True
     )
     movie = models.ForeignKey(Movie, models.CASCADE, related_name='reviews',
                               verbose_name='Фильм')
