@@ -1,4 +1,3 @@
-from ckeditor.widgets import CKEditorWidget
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
 from django.contrib import admin
@@ -17,7 +16,6 @@ class MovieAdminForm(forms.ModelForm):
     class Meta:
         model = Movie
         fields = '__all__'
-
 
 
 @admin.register(Category)
@@ -46,7 +44,6 @@ class MovieShotsInline(admin.TabularInline):
     get_image.short_description = 'Изображение'
 
 
-
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
     """Фильмы."""
@@ -57,6 +54,7 @@ class MovieAdmin(admin.ModelAdmin):
     save_on_top = True  # кнопки сохранения сверху
     save_as = True
     list_editable = ('draft',)  # редактируемое поле
+    actions = ['publish', 'unpublish']
     form = MovieAdminForm
     readonly_fields = ('get_image',)
     fieldsets = (
@@ -84,7 +82,32 @@ class MovieAdmin(admin.ModelAdmin):
     def get_image(self, obj):  # вывести миниатюру
         return mark_safe(f'<img src={obj.poster.url} width="100" height="110"')
 
+    def unpublish(self, request, queryset):
+        """Снять с публикации."""
+        row_update = queryset.update(draft=True)
+        if row_update == 1:
+            messege_bit = '1 запись была обновлена'
+        else:
+            messege_bit = f'{row_update} записей были обновлены'
+        self.message_user(request, f'{messege_bit}')
+
+    def publish(self, request, queryset):
+        """Опубликовать."""
+        row_update = queryset.update(draft=False)
+        if row_update == 1:
+            messege_bit = '1 запись была обновлена'
+        else:
+            messege_bit = f'{row_update} записей были обновлены'
+        self.message_user(request, f'{messege_bit}')
+
+    publish.short_description = 'Опубликовать'
+    publish.allowed_permissions = ('change',)
+
+    unpublish.short_description = 'Снять с публикации'
+    unpublish.allowed_permissions = ('change',)
+
     get_image.short_description = 'Постер'
+
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
@@ -105,10 +128,11 @@ class ActorAdmin(admin.ModelAdmin):
     list_display = ('name', 'age', 'get_image',)
     readonly_fields = ('get_image',)
 
-    def get_image(self, obj): # вывести миниатюру
+    def get_image(self, obj):  # вывести миниатюру
         return mark_safe(f'<img src={obj.image.url} width="50" height="60"')
 
     get_image.short_description = 'Изображение'
+
 
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
