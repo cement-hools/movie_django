@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 
 from .models import (Category, Genre, Movie, MovieShots, Actor, Rating,
                      RatingStar, Review)
+from .utils import case_of_entries
 
 
 class MovieAdminForm(forms.ModelForm):
@@ -85,19 +86,13 @@ class MovieAdmin(admin.ModelAdmin):
     def unpublish(self, request, queryset):
         """Снять с публикации."""
         row_update = queryset.update(draft=True)
-        if row_update == 1:
-            messege_bit = '1 запись была обновлена'
-        else:
-            messege_bit = f'{row_update} записей были обновлены'
+        messege_bit = case_of_entries(row_update)
         self.message_user(request, f'{messege_bit}')
 
     def publish(self, request, queryset):
         """Опубликовать."""
         row_update = queryset.update(draft=False)
-        if row_update == 1:
-            messege_bit = '1 запись была обновлена'
-        else:
-            messege_bit = f'{row_update} записей были обновлены'
+        messege_bit = case_of_entries(row_update)
         self.message_user(request, f'{messege_bit}')
 
     publish.short_description = 'Опубликовать'
